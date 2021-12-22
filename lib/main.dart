@@ -1,41 +1,67 @@
 import 'package:flutter/material.dart';
+import './hal_headset.dart' as headset;
+import './hal_komputer.dart' as komputer;
+import './hal_radio.dart' as radio;
+import './hal_smartphone.dart' as smartphone;
 
-void main() {
+void main(){
   runApp(new MaterialApp(
-    title: "Kang Service Application",
-    home: new HalamanSatu(),
-    routes: <String, WidgetBuilder>{
-      '/HalamanSatu' : (BuildContext context) => new HalamanSatu(),
-      '/HalamanDua' : (BuildContext context) => new HalamanDua(),
-    },
+    title: "Tab Bar",
+    home: new Home(),
   ));
 }
 
-class HalamanSatu extends StatelessWidget {
+class Home extends StatefulWidget {
+  const Home({ Key? key }) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
+
+  late TabController controller;
+
+  @override
+  void initState(){
+    controller = new TabController(vsync: this, length: 4);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(title: new Text("MUSIC")),
-      body: new Center(
-        child: new IconButton(icon: new Icon(Icons.headset, size: 50), onPressed: (){
-          Navigator.pushNamed(context, '/HalamanDua');
-        },),
+      appBar: new AppBar(
+        backgroundColor: Colors.amber,
+        title: new Text("Daftar Elektronik"),
+        bottom: new TabBar(
+          controller: controller,
+          indicatorColor: Colors.white,
+          tabs: [
+            new Tab(icon: new Icon(Icons.computer), text: "Komputer",),
+            new Tab(icon: new Icon(Icons.radio), text: "Radio"),
+            new Tab(icon: new Icon(Icons.smartphone), text: "Smartphone"),
+            new Tab(icon: new Icon(Icons.headset), text: "Headset",),
+          ],
+        ),
+      ),
+
+      body: new TabBarView(
+        controller: controller,
+        children: [
+          new komputer.Komputer(),
+          new radio.Radio(),
+          new smartphone.Smartphone(),
+          new headset.Headset()
+        ],
       ),
     );
   }
 }
-
-class HalamanDua extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(title: new Text("SPEAKER")),
-      body: new Center(
-        child: new IconButton(icon: new Icon(Icons.speaker, size: 50, color: Colors.red[300],), onPressed: (){
-          Navigator.pushNamed(context, '/HalamanSatu');
-        },),
-      ),
-    );
-  }
-}
-

@@ -4,63 +4,75 @@ import './hal_komputer.dart' as komputer;
 import './hal_radio.dart' as radio;
 import './hal_smartphone.dart' as smartphone;
 
-void main(){
+void main() {
   runApp(new MaterialApp(
     title: "Tab Bar",
     home: new Home(),
+    debugShowCheckedModeBanner: false,
   ));
 }
 
-class Home extends StatefulWidget {
-  const Home({ Key? key }) : super(key: key);
-
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
-
-  late TabController controller;
-
-  @override
-  void initState(){
-    controller = new TabController(vsync: this, length: 4);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    // TODO: implement dispose
-    super.dispose();
-  }
+class Home extends StatelessWidget {
+  const Home({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        backgroundColor: Colors.amber,
-        title: new Text("Daftar Elektronik"),
-        bottom: new TabBar(
-          controller: controller,
-          indicatorColor: Colors.white,
-          tabs: [
-            new Tab(icon: new Icon(Icons.computer), text: "Komputer",),
-            new Tab(icon: new Icon(Icons.radio), text: "Radio"),
-            new Tab(icon: new Icon(Icons.smartphone), text: "Smartphone"),
-            new Tab(icon: new Icon(Icons.headset), text: "Headset",),
+        appBar: new AppBar(
+          backgroundColor: Colors.amber[900],
+          title: new Text("List View"),
+        ),
+        body: new ListView(
+          children: [
+            new ListTutorial(
+              gambar:
+                  "https://m.media-amazon.com/images/I/81s5S0s2IGL._AC_SL1500_.jpg",
+              judul: "RADIO",
+            ),
+            new ListTutorial(
+              gambar:
+                  "https://selular.id/wp-content/uploads/2020/01/Simo-Luna-black-696x522.jpg",
+              judul: "SMARTPHONE",
+            ),
+            new ListTutorial(
+              gambar:
+                  "https://img.beritasatu.com/cache/beritasatu/620x350-2/1493280043.jpg",
+              judul: "KOMPUTER",
+            ),
+            // new ListTutorial(gambar: "https://koran-jakarta.com/images/library/headset-120521151310.jpg", judul: "HEADSET",),
+          ],
+        ));
+  }
+}
+
+class ListTutorial extends StatelessWidget {
+  ListTutorial({this.gambar = "", this.judul = ""});
+
+  final String gambar;
+  final String judul;
+
+  @override
+  Widget build(BuildContext context) {
+    return new Container(
+      height: 200.0,
+      width: 200.0,
+      decoration: BoxDecoration(
+        color: Colors.yellow[50],
+      ),
+      padding: new EdgeInsets.all(20.0),
+      child: new Center(
+        child: Column(
+          children: [
+            new Image(
+              image: new NetworkImage(gambar),
+              width: 200.0,
+            ),
+            new Text(
+              judul,
+              style: new TextStyle(fontSize: 20.0),
+            )
           ],
         ),
-      ),
-
-      body: new TabBarView(
-        controller: controller,
-        children: [
-          new komputer.Komputer(),
-          new radio.Radio(),
-          new smartphone.Smartphone(),
-          new headset.Headset()
-        ],
       ),
     );
   }

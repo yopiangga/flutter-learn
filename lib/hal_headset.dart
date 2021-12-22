@@ -12,7 +12,7 @@ class Headset extends StatelessWidget {
             new Padding(padding: new EdgeInsets.all(20.0)),
             new Text("HEADSET", style: new TextStyle(fontSize: 30.0),),
             new Padding(padding: new EdgeInsets.all(20.0)),
-            new Icon(Icons.headset, size: 90.0,),
+            new Image(image: new NetworkImage('https://koran-jakarta.com/images/library/headset-120521151310.jpg'), width: 200.0,)
           ],
         ),
       ),

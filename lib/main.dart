@@ -1,157 +1,166 @@
 // ignore_for_file: unnecessary_new, prefer_const_constructors
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/src/material/scaffold.dart';
 // import './detail.dart';
+import 'package:flutter/scheduler.dart';
 
 void main() {
   runApp(new MaterialApp(
-    title: "GRID dan HERO",
+    title: "Gradient, Circle Hero, Menu Dropdown",
     home: Home(),
     debugShowCheckedModeBanner: false,
   ));
 }
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({ Key? key }) : super(key: key);
 
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  List<Container> daftarSuperHero = [];
 
-  var users = [
-    {"nama": "Alfian Prisma Yopiangga", "gambar": "world-user-01.jpg"},
-    {"nama": "Krisna Wahyu Setiawan", "gambar": "world-user-02.jpg"},
-    {"nama": "Bintang Rezeka Ramadhani", "gambar": "world-user-03.jpg"},
-    {"nama": "Muhamammad Rifqi lutfi", "gambar": "world-user-04.jpg"},
-    {"nama": "Muqorroba Lada Sattar", "gambar": "world-user-05.jpg"},
-    {"nama": "Rosalinda Dwi Vicessa", "gambar": "world-user-06.jpg"},
-    {"nama": "Josepphine Kristianti", "gambar": "world-user-07.jpg"},
-    {"nama": "Muadz Fatullah", "gambar": "world-user-08.jpg"},
-  ];
-
-  _buatList() async {
-    for (var i = 0; i < users.length; i++) {
-      final user = users[i];
-      final String gambar = user["gambar"].toString();
-      daftarSuperHero.add(
-        new Container(
-            padding: EdgeInsets.all(10),
-            child: new Card(
-              child: Column(
-                children: [
-                  new Hero(
-                    tag: user["nama"].toString(),
-                    child: new Material(
-                      child: new InkWell(
-                        onTap: () =>
-                            Navigator.of(context).push(new MaterialPageRoute(
-                          builder: (BuildContext context) => new Detail(
-                              nama: user["nama"].toString(), gambar: gambar),
-                        )),
-                        child: new Image.asset(
-                          "assets/images/$gambar",
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // new Text(user["nama"].toString(), style: new TextStyle(fontSize: 14.0),),
-                ],
-              ),
-            )),
-      );
-    }
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    _buatList();
-    super.initState();
-  }
+  final List<String> gambar = [
+    "world-user-01.jpg",
+    "world-user-02.jpg",
+    "world-user-03.jpg",
+    "world-user-04.jpg",
+    "world-user-05.jpg",
+    "world-user-06.jpg",
+    "world-user-07.jpg",
+    "world-user-08.jpg",
+    ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: new Text("Super Hero 2",
-            style: new TextStyle(
-              color: Colors.white,
-            )),
-      ),
-      body: GridView.count(
-        crossAxisCount: 2,
-        children: daftarSuperHero,
-      ),
+    timeDilation = 2;
+    return new Scaffold(
+        body: new Container(
+          decoration: new BoxDecoration(
+            gradient: new LinearGradient(
+              begin: FractionalOffset.topRight,
+              end: FractionalOffset.bottomLeft,
+              colors: [
+                Colors.red,
+                Colors.yellow,
+                Colors.green
+              ]
+            )
+          ),
+          child: new PageView.builder(
+            controller: new PageController(viewportFraction: 0.92),
+            itemCount: gambar.length,
+            itemBuilder: (BuildContext context, int i){
+              return Padding(
+                padding: new EdgeInsets.symmetric(
+                  horizontal: 5,
+                  vertical: 22
+                ),
+                child: new Material(
+                  borderRadius: new BorderRadius.all(Radius.circular(20)),
+                  elevation: 8,
+                  child: new Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      new Hero(
+                        tag: gambar[i], 
+                        child: new Material(
+                          child: new InkWell(
+                            onTap: ()=> Navigator.of(context).push(
+                              new MaterialPageRoute(
+                                  builder: (BuildContext context)=> new HalamanDua(gambar: gambar[i],)
+                                )
+                            ),
+                            child: new Image.asset("assets/images/${gambar[i]}", fit: BoxFit.cover,)),
+                          ),
+                        )
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
     );
   }
 }
 
-class Detail extends StatelessWidget {
-  Detail({this.nama = "", this.gambar = ""});
-
-  final String nama;
+class HalamanDua extends StatefulWidget {
+  HalamanDua({this.gambar = ""});
   final String gambar;
+
+  @override
+  State<HalamanDua> createState() => _HalamanDuaState();
+}
+
+class _HalamanDuaState extends State<HalamanDua> {
+
+  Color warna = Colors.grey;
+
+  void _pilihannya(Pilihan pilihan){
+    setState(() {
+      warna = pilihan.warna;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: new ListView(
-        children: [
-          new Container(
-              height: 240,
-              child: new Hero(
-                  tag: nama,
-                  child: new Material(
-                    child: new InkWell(
-                      child: new Image.asset("assets/images/$gambar", fit: BoxFit.cover,),
-                    ),
-                  ))),
-            new BagianNama(nama: nama),
-            new BagianIcon(),
-            new BagianKeterangan(),
+      appBar: new AppBar(
+        title: new Text("DATA MANUSIA",),
+        backgroundColor: Colors.grey,
+        actions: [
+          new PopupMenuButton<Pilihan>(
+            onSelected: _pilihannya,
+            itemBuilder: (BuildContext context){
+              return listPilihan.map((Pilihan x){
+                return new PopupMenuItem<Pilihan>(
+                  child: new Text(x.teks),
+                  value: x,
+                );
+              }).toList();
+            },
+          )
         ],
       ),
-    );
-  }
-}
-
-
-class BagianNama extends StatelessWidget {
-
-  BagianNama({this.nama = ""});
-
-  final String nama;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: new EdgeInsets.all(10),
-      child: Row(
+      body: new Stack(
         children: [
-          Expanded(
-            child: new Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                new Text(nama, style: new TextStyle(fontSize: 20.0, color: Colors.blue)),
-                new Text("$nama@email.com", style: new TextStyle(fontSize: 17.0, color: Colors.grey)),
-              ],
+          new Container(
+            decoration: new BoxDecoration(
+              gradient: new RadialGradient(
+                center: Alignment.center,
+                colors: [
+                  Colors.blue,
+                  warna,
+                  Colors.black.withOpacity(0.9)
+                ]
+              )
             ),
           ),
 
-          new Row(
-            children: [
-              new Icon(Icons.star, size: 30.0, color: Colors.yellow,),
-              new Text("12")
-            ],
+          new Center(
+            child: new Hero(
+              tag: widget.gambar,
+              child: ClipOval(
+                child: SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: new Material(
+                    child: new InkWell(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: new Image.asset("assets/images/${widget.gambar}", fit: BoxFit.cover,),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           )
         ],
       ),
@@ -159,56 +168,15 @@ class BagianNama extends StatelessWidget {
   }
 }
 
-class BagianIcon extends StatelessWidget {
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: new EdgeInsets.all(10),
-      child: Row(
-        children: [
-          Expanded(
-            child: new Column(
-              children: [
-                new Icon(Icons.phone, size: 50, color: Colors.blue,),
-                new Text("Call", style: new TextStyle(fontSize: 18, color: Colors.blue))
-              ],
-            ),
-          ),
-          Expanded(
-            child: new Column(
-              children: [
-                new Icon(Icons.message, size: 50, color: Colors.blue,),
-                new Text("Message", style: new TextStyle(fontSize: 18, color: Colors.blue))
-              ],
-            ),
-          ),
-          Expanded(
-            child: new Column(
-              children: [
-                new Icon(Icons.photo, size: 50, color: Colors.blue,),
-                new Text("Photo", style: new TextStyle(fontSize: 18, color: Colors.blue))
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+class Pilihan{
+  const Pilihan({this.teks = "", this.warna = Colors.white});
+  final String teks;
+  final Color warna;
 }
 
-
-class BagianKeterangan extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: new EdgeInsets.all(10),
-      child: new Card(
-        child: Padding(
-          padding: new EdgeInsets.all(20),
-          child: new Text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.", style: new TextStyle(fontSize: 18), textAlign: TextAlign.justify,)),
-      ),
-    );
-  }
-}
+List<Pilihan> listPilihan = const <Pilihan>[
+  const Pilihan(teks: "Strength", warna: Colors.red),
+  const Pilihan(teks: "Agility", warna: Colors.green),
+  const Pilihan(teks: "Intelligence", warna: Colors.blue),
+];

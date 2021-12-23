@@ -3,10 +3,11 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/src/material/scaffold.dart';
+import './detail.dart';
 
 void main() {
   runApp(new MaterialApp(
-    title: "Input Text, Alert & Snackbar",
+    title: "Side Bar",
     home: new Home(),
     debugShowCheckedModeBanner: false,
   ));
@@ -20,92 +21,87 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String teks = "";
+  String gambar1 =
+      "https://cdn5.f-cdn.com/ppic/165305021/logo/45880587/KuLJp/profile_logo_IUJMP_d0efebb2c82aa49ca00f954fd1cb2804.png";
+  String gambar2 =
+      "https://upload.wikimedia.org/wikipedia/commons/3/3c/Punctuation_Idem.png";
+  String backup = "";
 
-  TextEditingController controllerInput = new TextEditingController();
-  TextEditingController controllerAlert = new TextEditingController();
-  TextEditingController controllerSnackbar = new TextEditingController();
+  String nama1 = "Alfian Prisma Yopiangga";
+  String nama2 = "Web Petikdua";
+  String backupNama = "";
 
-  void _alertdialog(String str) {
-    if (str.isEmpty) return;
+  String email1 = "yopiangga@email.com";
+  String email2 = "petikdua@email.com";
+  String backupEmail = "";
 
-    AlertDialog alertDialog = new AlertDialog(
-      content: new Text(str, style: new TextStyle(fontSize: 20)),
-      actions: [
-        new RaisedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          color: Colors.purple,
-          child: new Text("Ok"),
-        )
-      ],
-    );
+  void gantiuser() {
+    this.setState(() {
+      backup = gambar1;
+      gambar1 = gambar2;
+      gambar2 = backup;
 
-    showDialog(
-        context: context,
-        builder: (context) {
-          return alertDialog;
-        });
-  }
+      backupNama = nama1;
+      nama1 = nama2;
+      nama2 = backupNama;
 
-  final GlobalKey<ScaffoldState> _scaffoldState = new GlobalKey<ScaffoldState>();
-
-  void _snackbar(String str){
-    if(str.isEmpty) return;
-
-    _scaffoldState.currentState!.showSnackBar(
-      new SnackBar(
-        content: new Text(str, style: new TextStyle(fontSize: 20)),
-        duration: new Duration(seconds: 3),
-        )
-    );
+      backupEmail = email1;
+      email1 = email2;
+      email2 = backupEmail;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldState,
       appBar: AppBar(
-        title: new Text("INPUT TEXT, ALERT & SNACKBAR"),
-        backgroundColor: Colors.purple,
+        title: new Text("Demo Sidebar (DRAWER)"),
+        backgroundColor: Colors.green[500],
       ),
-      body: new Container(
-        child: new Column(
+      drawer: new Drawer(
+        child: new ListView(
           children: [
-            new TextField(
-                controller: controllerInput,
-                decoration: new InputDecoration(hintText: "Tulis di sini"),
-                onSubmitted: (String str) {
-                  setState(() {
-                    teks = str + '\n' + teks;
-                    controllerInput.text = "";
-                  });
-                }),
-            new Text(teks,
-                style: new TextStyle(
-                  fontSize: 20,
-                )),
-            new TextField(
-                controller: controllerAlert,
-                decoration:
-                    new InputDecoration(hintText: "Tulis untuk alert ... "),
-                onSubmitted: (String str) {
-                  _alertdialog(str);
-                  controllerAlert.text = "";
-                }),
-
-                new TextField(
-                controller: controllerSnackbar,
-                decoration:
-                    new InputDecoration(hintText: "Tulis untuk snackbar ... "),
-                onSubmitted: (String str) {
-                  _snackbar(str);
-                  controllerSnackbar.text = "";
-                }),
+            new UserAccountsDrawerHeader(
+              accountName: new Text(nama1),
+              accountEmail: new Text(email1),
+              // currentAccountPicture: new Image(image: NetworkImage("https://cdn5.f-cdn.com/ppic/165305021/logo/45880587/KuLJp/profile_logo_IUJMP_d0efebb2c82aa49ca00f954fd1cb2804.png")),
+              currentAccountPicture: new GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          new Detail(nama: nama1, gambar: gambar1)));
+                },
+                child: new CircleAvatar(
+                  backgroundColor: Colors.white,
+                  backgroundImage: new NetworkImage(gambar1),
+                ),
+              ),
+              decoration: new BoxDecoration(
+                  image: new DecorationImage(
+                      image: new NetworkImage(
+                          "https://wallpapercave.com/wp/SlF16Av.jpg"),
+                      fit: BoxFit.cover)),
+              otherAccountsPictures: [
+                new GestureDetector(
+                  onTap: () => gantiuser(),
+                  child: new CircleAvatar(
+                    backgroundImage: new NetworkImage(gambar2),
+                    backgroundColor: Colors.white,
+                  ),
+                )
+              ],
+            ),
+            new ListTile(
+              title: new Text("Setting"),
+              trailing: new Icon(Icons.settings),
+            ),
+            new ListTile(
+                title: new Text("Close"), trailing: new Icon(Icons.close)),
           ],
         ),
       ),
+      body: new Container(),
     );
   }
 }

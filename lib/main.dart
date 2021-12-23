@@ -1,38 +1,71 @@
 import 'package:flutter/material.dart';
-import './hal_headset.dart' as headset;
-import './hal_komputer.dart' as komputer;
-import './hal_radio.dart' as radio;
-import './hal_smartphone.dart' as smartphone;
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:convert';
 
 void main() {
   runApp(new MaterialApp(
     title: "List View",
-    home: new Home(data: new List<String>.generate(300, (i) => "ini data ke $i"),),
+    home: new Home(),
     debugShowCheckedModeBanner: false,
   ));
 }
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
 
-  Home({this.data = const [""]});
-  final List<String> data;
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  late List dataJSON = [
+    {'title': "a", 'body': "b"}
+  ];
+
+  Future<String> ambilData() async {
+    http.Response hasil = await http.get(
+        Uri.encodeFull("https://jsonplaceholder.typicode.com/posts"),
+        headers: {"Accept": "application/json"});
+
+    this.setState(() {
+      dataJSON = jsonDecode(hasil.body);
+    });
+
+    return hasil.body;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    this.ambilData();
+  }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: new AppBar(
-          title: new Text("List View"),
-        ),
-        body: new Container(
-          child: new ListView.builder(
-            itemCount: data.length,
-            itemBuilder: (context, index){
-              return new ListTile(
-                leading: new Icon(Icons.widgets),
-                title: new Text("${data[index]}"),
-              );
-            }),
-          ),
-        );
+      appBar: AppBar(
+        title: new Text("List Data JSON"),
+      ),
+      body: new ListView.builder(
+          itemCount: dataJSON == null ? 0 : dataJSON.length,
+          itemBuilder: (context, i) {
+            return new Card(
+              child: new Container(
+                padding: EdgeInsets.all(20),
+                child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  new Text(dataJSON[i]['title'] , style: new TextStyle(fontSize: 20.0, color: Colors.blue),),
+                  new Container(
+                    padding: EdgeInsets.only(top: 10),
+                    child: new Text(dataJSON[i]['body']),
+                  )
+                ],
+              )
+              )
+            );
+          }),
+    );
   }
 }

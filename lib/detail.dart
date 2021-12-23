@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_unnecessary_containers, unnecessary_new
+
 import 'package:flutter/material.dart';
 
 class Detail extends StatelessWidget {

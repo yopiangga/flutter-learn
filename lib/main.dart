@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/src/material/scaffold.dart';
 
 void main() {
   runApp(new MaterialApp(
-    title: "List View",
+    title: "Input Text, Alert & Snackbar",
     home: new Home(),
     debugShowCheckedModeBanner: false,
   ));
@@ -19,53 +20,92 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late List dataJSON = [
-    {'title': "a", 'body': "b"}
-  ];
+  String teks = "";
 
-  Future<String> ambilData() async {
-    http.Response hasil = await http.get(
-        Uri.encodeFull("https://jsonplaceholder.typicode.com/posts"),
-        headers: {"Accept": "application/json"});
+  TextEditingController controllerInput = new TextEditingController();
+  TextEditingController controllerAlert = new TextEditingController();
+  TextEditingController controllerSnackbar = new TextEditingController();
 
-    this.setState(() {
-      dataJSON = jsonDecode(hasil.body);
-    });
+  void _alertdialog(String str) {
+    if (str.isEmpty) return;
 
-    return hasil.body;
+    AlertDialog alertDialog = new AlertDialog(
+      content: new Text(str, style: new TextStyle(fontSize: 20)),
+      actions: [
+        new RaisedButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          color: Colors.purple,
+          child: new Text("Ok"),
+        )
+      ],
+    );
+
+    showDialog(
+        context: context,
+        builder: (context) {
+          return alertDialog;
+        });
   }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    this.ambilData();
+  final GlobalKey<ScaffoldState> _scaffoldState = new GlobalKey<ScaffoldState>();
+
+  void _snackbar(String str){
+    if(str.isEmpty) return;
+
+    _scaffoldState.currentState!.showSnackBar(
+      new SnackBar(
+        content: new Text(str, style: new TextStyle(fontSize: 20)),
+        duration: new Duration(seconds: 3),
+        )
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
+      key: _scaffoldState,
       appBar: AppBar(
-        title: new Text("List Data JSON"),
+        title: new Text("INPUT TEXT, ALERT & SNACKBAR"),
+        backgroundColor: Colors.purple,
       ),
-      body: new ListView.builder(
-          itemCount: dataJSON == null ? 0 : dataJSON.length,
-          itemBuilder: (context, i) {
-            return new Card(
-              child: new Container(
-                padding: EdgeInsets.all(20),
-                child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  new Text(dataJSON[i]['title'] , style: new TextStyle(fontSize: 20.0, color: Colors.blue),),
-                  new Container(
-                    padding: EdgeInsets.only(top: 10),
-                    child: new Text(dataJSON[i]['body']),
-                  )
-                ],
-              )
-              )
-            );
-          }),
+      body: new Container(
+        child: new Column(
+          children: [
+            new TextField(
+                controller: controllerInput,
+                decoration: new InputDecoration(hintText: "Tulis di sini"),
+                onSubmitted: (String str) {
+                  setState(() {
+                    teks = str + '\n' + teks;
+                    controllerInput.text = "";
+                  });
+                }),
+            new Text(teks,
+                style: new TextStyle(
+                  fontSize: 20,
+                )),
+            new TextField(
+                controller: controllerAlert,
+                decoration:
+                    new InputDecoration(hintText: "Tulis untuk alert ... "),
+                onSubmitted: (String str) {
+                  _alertdialog(str);
+                  controllerAlert.text = "";
+                }),
+
+                new TextField(
+                controller: controllerSnackbar,
+                decoration:
+                    new InputDecoration(hintText: "Tulis untuk snackbar ... "),
+                onSubmitted: (String str) {
+                  _snackbar(str);
+                  controllerSnackbar.text = "";
+                }),
+          ],
+        ),
+      ),
     );
   }
 }
